@@ -1,0 +1,18 @@
+# 忽略环境变量文件
+.env
+.env.*
+
+# 忽略操作系统生成文件
+.DS_Store
+Thumbs.db
+
+# 忽略编辑器临时文件
+*.swp
+*.swo
+*~
+
+# 忽略日志文件
+*.log
+
+# 忽略n8n自动生成的凭据文件
+*.credentials.json

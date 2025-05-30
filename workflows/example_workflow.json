@@ -1,0 +1,11 @@
+{
+  "name": "示例工作流",
+  "nodes": [
+    {
+      "name": "开始节点",
+      "type": "n8n-nodes-base.start",
+      "parameters": {}
+    }
+  ],
+  "connections": {}
+}
