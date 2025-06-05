@@ -1,0 +1,119 @@
+{
+  "name": "社区节点+谷歌趋势",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "google_trends",
+        "q": "={{ $json.chatInput }}",
+        "additionalFields": {},
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-serpapi.serpApi",
+      "typeVersion": 1,
+      "position": [
+        240,
+        -40
+      ],
+      "id": "6ff5cc62-ca95-4357-a521-50bcb90b711e",
+      "name": "SerpApi",
+      "credentials": {
+        "serpApi": {
+          "id": "p7cURwN03YEu1QBd",
+          "name": "SerpAPI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chartType": "line",
+        "labelsMode": "array",
+        "labelsArray": "={{ $json.dates }}",
+        "data": "={{ $json.values }}",
+        "chartOptions": {},
+        "datasetOptions": {}
+      },
+      "type": "n8n-nodes-base.quickChart",
+      "typeVersion": 1,
+      "position": [
+        860,
+        -40
+      ],
+      "id": "2f0e0d1a-8f80-4630-a5a8-2245942a030c",
+      "name": "QuickChart"
+    },
+    {
+      "parameters": {
+        "jsCode": "// 获取输入数据\nconst timelineData = $input.first().json.interest_over_time.timeline_data;\n\n// 分别提取日期和值到两个数组\nconst dates = timelineData.map(item => item.date);\nconst values = timelineData.map(item => item.values[0].extracted_value);\n\n// 返回结果\nreturn [{\n  json: {\n    dates: dates,\n    values: values\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        560,
+        -40
+      ],
+      "id": "02b4c55f-3794-4263-ba5b-f48be111b21a",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -40,
+        -40
+      ],
+      "id": "d068c0d9-6b0b-4e1d-a64c-7f5a8faa88da",
+      "name": "When chat message received",
+      "webhookId": "d656de71-bc12-402e-a028-4efa99f9c7a4"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "SerpApi": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "QuickChart",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "SerpApi",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "024901a1-e0c3-4a69-b58f-0199815ca165",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "667f8e49cea6f05a4f2d4764a2ef083b44c681d7bcf3709cc71f85be90eeca2e"
+  },
+  "id": "zSnSXy5PpNTTyD7V",
+  "tags": []
+}
