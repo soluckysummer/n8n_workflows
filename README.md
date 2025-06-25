@@ -7,6 +7,7 @@
 2. AI学长的博客：https://ai.linbintalk.com/
 
 ## 工作流列表
+- [一键生成AI工作流：全自动N8N MCP，告别手动搭建 | N8N新手必备！](./workflows/每日食谱推荐.json)
 - [N8N重磅升级：一键解锁2000+AI工作流节点！](./workflows/community_nodes.json)
 - [还在手动整理Excel？试试这个AI工作流，一键完成数据清洗与校验！](./workflows/ExcelAutoCleaning.json)
 - [AI自动化：一键批量生成爆款海报，效率提升100倍](./workflows/n8nposter.json)

@@ -1,0 +1,278 @@
+{
+  "name": "每日食谱推荐",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 7
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -400,
+        200
+      ],
+      "id": "schedule-trigger",
+      "name": "每日7点定时触发"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "user-info",
+              "name": "userInfo",
+              "value": "请根据实际情况修改：2人家庭，成年人，注重营养均衡",
+              "type": "string"
+            },
+            {
+              "id": "diet-preference",
+              "name": "dietPreference",
+              "value": "请根据实际情况修改：不吃辣，偏爱清淡口味，不挑食",
+              "type": "string"
+            },
+            {
+              "id": "current-date",
+              "name": "currentDate",
+              "value": "={{ $now.format('yyyy年MM月dd日 dddd') }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -200,
+        200
+      ],
+      "id": "user-settings",
+      "name": "用户设置"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "请为{{ $json.currentDate }}制定三餐菜谱",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=你是专业的营养师和食谱规划师。请为用户制定今日三餐菜谱。\n\n用户信息：{{ $json.userInfo }}\n饮食偏好：{{ $json.dietPreference }}\n日期：{{ $json.currentDate }}\n\n要求：\n1. 制定早餐、午餐、晚餐三餐菜谱\n2. 每餐包含2-3道菜\n3. 注重营养均衡和搭配\n4. 考虑季节性食材\n5. 提供详细的食材清单\n6. 简要说明营养价值\n\n输出格式：请严格按照JSON格式输出，包含breakfast、lunch、dinner和ingredients字段。"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.8,
+      "position": [
+        0,
+        200
+      ],
+      "id": "ai-menu-generator",
+      "name": "AI菜谱生成器"
+    },
+    {
+      "parameters": {
+        "options": {
+          "temperature": 0.7,
+          "topP": 0.9
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatDeepSeek",
+      "typeVersion": 1,
+      "position": [
+        0,
+        400
+      ],
+      "id": "deepseek-model",
+      "name": "DeepSeek模型",
+      "credentials": {
+        "deepSeekApi": {
+          "id": "peOp7pcjSxphhmmF",
+          "name": "DeepSeek account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"breakfast\": [\"小米粥\", \"煮蛋\", \"咸菜\"],\n  \"lunch\": [\"米饭\", \"红烧肉\", \"清炒小白菜\", \"紫菜蛋花汤\"],\n  \"dinner\": [\"面条\", \"西红柿鸡蛋\", \"凉拌黄瓜\"],\n  \"ingredients\": [\"小米\", \"鸡蛋\", \"猪肉\", \"小白菜\", \"紫菜\", \"面条\", \"西红柿\", \"黄瓜\"],\n  \"nutrition\": \"营养均衡，包含蛋白质、维生素和膳食纤维\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        200,
+        400
+      ],
+      "id": "structured-parser",
+      "name": "结构化输出解析器"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "formatted-menu",
+              "name": "formattedMenu",
+              "value": "={{ $json.output.currentDate }}美食菜单\\n\\n🌅 早餐：\\n{{ $json.output.breakfast.map(item => '• ' + item).join('\\n') }}\\n\\n🍽️ 午餐：\\n{{ $json.output.lunch.map(item => '• ' + item).join('\\n') }}\\n\\n🌙 晚餐：\\n{{ $json.output.dinner.map(item => '• ' + item).join('\\n') }}\\n\\n🛒 采购清单：\\n{{ $json.output.ingredients.map(item => '• ' + item).join('\\n') }}\\n\\n💡 营养提示：\\n{{ $json.output.nutrition }}",
+              "type": "string"
+            },
+            {
+              "id": "email-subject",
+              "name": "emailSubject",
+              "value": "={{ $json.output.currentDate }}每日食谱推荐",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        400,
+        200
+      ],
+      "id": "format-output",
+      "name": "格式化输出"
+    },
+    {
+      "parameters": {
+        "text": "={{ $json.formattedMenu }}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "disable_notification": false,
+          "parse_mode": "Markdown"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        600,
+        100
+      ],
+      "id": "telegram-sender",
+      "name": "Telegram发送",
+      "webhookId": "46e76bbd-7a14-4d0f-8528-07f55db2c2d9",
+      "credentials": {
+        "telegramApi": {
+          "id": "5JwRrhgTJYtXI8UD",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "subject": "={{ $json.emailSubject }}",
+        "emailType": "text",
+        "message": "={{ $json.formattedMenu }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        600,
+        300
+      ],
+      "id": "gmail-sender",
+      "name": "Gmail发送",
+      "webhookId": "d7e2dada-3ca1-4272-abe3-8eef1cf0b996",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "请配置Gmail OAuth2",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "每日7点定时触发": {
+      "main": [
+        [
+          {
+            "node": "用户设置",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "用户设置": {
+      "main": [
+        [
+          {
+            "node": "AI菜谱生成器",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI菜谱生成器": {
+      "main": [
+        [
+          {
+            "node": "格式化输出",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DeepSeek模型": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI菜谱生成器",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "结构化输出解析器": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI菜谱生成器",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "格式化输出": {
+      "main": [
+        [
+          {
+            "node": "Telegram发送",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Gmail发送",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "saveExecutionProgress": true,
+    "saveManualExecutions": true,
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "all",
+    "executionTimeout": 3600,
+    "timezone": "UTC"
+  },
+  "versionId": "bbd27729-2dde-4003-9815-4c1fe740b94b",
+  "meta": {
+    "instanceId": "667f8e49cea6f05a4f2d4764a2ef083b44c681d7bcf3709cc71f85be90eeca2e"
+  },
+  "id": "fQQVeD1vawUL3Fqr",
+  "tags": []
+}
