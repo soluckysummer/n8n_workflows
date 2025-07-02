@@ -1,0 +1,484 @@
+{
+  "name": "自动获取公众号文章",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -620,
+        155
+      ],
+      "id": "8991cb87-128e-4c6c-94e1-1928d257f246",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1aead2d8-db32-4837-a7bc-4f654b159db4",
+              "name": "biz",
+              "value": "[\"MzIzNjc1NzUzMw==\",\"MzI3MTA0MTk1MA==\",\"MzA3MzI4MjgzMw==\"]",
+              "type": "array"
+            },
+            {
+              "id": "3152a413-b0db-4206-a571-c80df9a90b2b",
+              "name": "name",
+              "value": "[\"量子位\",\"新智元\",\"机器之心\"]",
+              "type": "array"
+            },
+            {
+              "id": "742495c8-fb2c-4664-8fb0-91dea7d4ce94",
+              "name": "key",
+              "value": "极致了APIKEY",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -400,
+        160
+      ],
+      "id": "c97d3724-7ed0-4f00-bb29-353bc7f5d059",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        260,
+        155
+      ],
+      "id": "8c627c3a-9fc4-412b-86ac-f41dd12446ea",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://www.dajiala.com/fbmain/monitor/v3/post_history",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"biz\": \"{{ $json.key }}\",\n  \"url\": \"\",\n  \"name\": \"{{ $json.value }}\",\n  \"page\": 1,\n  \"key\": \"{{ $('Edit Fields').item.json.key }}\",\n  \"verifycode\": \"\"\n}",
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        480,
+        80
+      ],
+      "id": "a7d3cc13-0425-488f-910e-d7159c5fc868",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.url }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "*/*"
+            },
+            {
+              "name": "Accept-Encoding",
+              "value": "deflate, gzip"
+            },
+            {
+              "name": "User-Agent",
+              "value": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36"
+            },
+            {
+              "name": "Host",
+              "value": "mp.weixin.qq.com"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        920,
+        -20
+      ],
+      "id": "f66eb260-64f3-4c42-8751-25068f0b954a",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "operation": "extractHtmlContent",
+        "extractionValues": {
+          "values": [
+            {
+              "key": "data",
+              "cssSelector": "#page-content"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.html",
+      "typeVersion": 1.2,
+      "position": [
+        1140,
+        -20
+      ],
+      "id": "0bc87775-7a1b-4b29-b708-d3dfd171e532",
+      "name": "HTML"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        40,
+        160
+      ],
+      "id": "4bd71e91-e167-489d-a9d3-c7679c0e4a7a",
+      "name": "Limit"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "data",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        700,
+        80
+      ],
+      "id": "ee321293-b69a-4cfb-9432-9d648d8a1818",
+      "name": "Split Out1"
+    },
+    {
+      "parameters": {
+        "jsCode": "/**\n * 将Markdown文本转换为纯文本\n * @param {string} markdown - 输入的Markdown格式文本\n * @returns {string} - 转换后的纯文本字符串\n */\nfunction markdownToText(markdown) {\n    if (!markdown) return '';\n\n    let text = markdown;\n\n    // 移除代码块\n    text = text.replace(/```[\\s\\S]*?```/g, '');\n    text = text.replace(/`([^`]+)`/g, '$1');\n\n    // 移除标题符号\n    text = text.replace(/^#{1,6}\\s+/gm, '');\n\n    // 移除粗体和斜体\n    text = text.replace(/[*_]{2}([^*_]+)[*_]{2}/g, '$1'); // 粗体\n    text = text.replace(/[*_]([^*_]+)[*_]/g, '$1'); // 斜体\n\n    // 处理链接\n    text = text.replace(/\\[([^\\]]+)\\]\\([^)]+\\)/g, '$1'); // [文本](链接)\n    text = text.replace(/\\[([^\\]]+)\\]\\[[^\\]]*\\]/g, '$1'); // [文本][引用]\n\n    // 移除图片标记\n    text = text.replace(/!\\[([^\\]]*?)\\]\\([^)]+\\)/g, '$1');\n    \n    // 处理各种非标准格式的图片标记\n    text = text.replace(/!图片\\s*\\)/g, '');\n    text = text.replace(/!图片\\s*$/g, '');\n    text = text.replace(/!图片[\\s\\S]*?\\)/g, '');\n    text = text.replace(/^\\s*\\)\\s*$/gm, '');\n    text = text.replace(/^\\s*$/gm, '');\n\n    // 处理列表\n    text = text.replace(/^[\\s]*[\\-*+]\\s+/gm, ''); // 无序列表\n    text = text.replace(/^[\\s]*\\d+\\.\\s+/gm, ''); // 有序列表\n\n    // 处理引用\n    text = text.replace(/^\\s*>\\s+/gm, '');\n\n    // 处理水平分割线\n    text = text.replace(/^\\s*[-*_]{3,}\\s*$/gm, '\\n');\n\n    // 移除SVG相关标签及其内容\n    text = text.replace(/<svg[^>]*>(([\\s\\S]*?)<\\/svg>)?/gi, '');\n    \n    // 增强SVG标签清理\n    const svgElements = 'svg|rect|circle|path|line|polygon|polyline|g|defs|use|symbol|ellipse|text|image|clipPath|mask|pattern|filter|marker|linearGradient|radialGradient|stop|tspan|textPath|animate|animateMotion|animateTransform|set|foreignObject|switch|desc|title|metadata';\n    text = text.replace(new RegExp(`<(${svgElements})(\\\\s[^>]*)?\\\\/?>`,'gi'), '');\n    text = text.replace(new RegExp(`<\\\\/(${svgElements})>`,'gi'), '');\n    \n    // 移除单独的SVG标签片段\n    text = text.replace(/[\\s']+(?:rect|circle|path|g|svg|defs|use|symbol)\\s*\\/?/gi, ' ');\n    text = text.replace(/[\\s']+\\/(?:rect|circle|path|g|svg|defs|use|symbol)\\s*/gi, ' ');\n    \n    // 移除括号内的SVG标签片段\n    text = text.replace(/\\([^\\)]*?(?:rect|circle|path|g|svg)[^\\)]*?\\)/gi, '');\n    \n    // 清理SVG属性和标签片段\n    text = text.replace(/['\"\\s]+(fill|x|y|width|height|rx|ry|cx|cy|r|d|points|viewBox|xmlns)=['\"]?[^'\">\\s]*['\"]?/gi, ' ');\n    text = text.replace(/\\s+(?:\\/)?(?:rect|circle|path|g|svg|defs|use|symbol|ellipse|text)(?:\\s+|\\/)/gi, ' ');\n    text = text.replace(/\\s+\\/(?:rect|circle|path|g|svg|defs|use|symbol|ellipse|text)(?:\\s+|$)/gi, ' ');\n    \n    // 移除SVG和HTML常见属性\n    const commonAttributes = 'xmlns|version|viewBox|width|height|class|style|id|fill|stroke|d|points|transform|x|y|cx|cy|r|x1|y1|x2|y2|dx|dy|offset|gradientUnits|spreadMethod|patternUnits|patternTransform|markerWidth|markerHeight|refX|refY|orient|font-size|font-family|text-anchor|alignment-baseline|href|xlink:href|preserveAspectRatio';\n    text = text.replace(new RegExp(`\\\\s+(${commonAttributes})=[\\\"\\']([^\\\"\\']*)[\\\"\\'](?:\\\\s+|$)`,'gi'), ' ');\n    \n    // 移除data URI和编码内容\n    text = text.replace(/data:(?:[^;]+;)*(?:base64,)?[a-zA-Z0-9+/]+={0,2}/g, '');\n    text = text.replace(/%[0-9a-fA-F]{2}/g, ' ');\n    \n    // 最终清理：移除任何剩余的SVG相关内容\n    text = text.replace(/\\([^\\)]*(?:svg|rect|g|path|circle)[^\\)]*\\)/gi, '');\n    text = text.replace(/'[^']*(?:svg|rect|g|path|circle)[^']*'/gi, '');\n    text = text.replace(/\"[^\"]*(?:svg|rect|g|path|circle)[^\"]*\"/gi, '');\n    text = text.replace(/(?:\\/)?(?:svg|rect|g|path|circle|defs|use|symbol)(?:\\/)?/gi, '');\n    \n    // 移除其他HTML标签\n    text = text.replace(/<[^>]+>/g, '');\n\n    // 处理转义字符\n    text = text.replace(/\\\\([\\\\`*_{}\\[\\]()#+\\-.!])/g, '$1');\n\n    // 清理多余的空行\n    text = text.replace(/\\n\\s*\\n/g, '\\n\\n');\n    text = text.replace(/^\\s+|\\s+$/g, '');\n\n    return text;\n}\n\n/**\n * 将文本按指定长度分段\n * @param {string} text - 输入文本\n * @param {number} segmentLength - 每段文本的最大长度\n * @returns {string[]} - 分段后的文本数组\n */\nfunction splitTextIntoSegments(text, segmentLength = 1800) {\n    const segments = [];\n    let remainingText = text;\n\n    while (remainingText.length > 0) {\n        if (remainingText.length <= segmentLength) {\n            segments.push(remainingText);\n            break;\n        }\n\n        let endIndex = segmentLength;\n        // 尝试在句子或段落边界处分段\n        const nextParagraph = remainingText.indexOf('\\n\\n', endIndex - 100);\n        const nextSentence = remainingText.indexOf('. ', endIndex - 100);\n\n        if (nextParagraph !== -1 && nextParagraph < endIndex + 100) {\n            endIndex = nextParagraph;\n        } else if (nextSentence !== -1 && nextSentence < endIndex + 100) {\n            endIndex = nextSentence + 1;\n        }\n\n        segments.push(remainingText.substring(0, endIndex).trim());\n        remainingText = remainingText.substring(endIndex).trim();\n    }\n\n    return segments;\n}\n\n// 获取所有输入数据项\nconst inputItems = $input.all();\nconst results = [];\n\n// 遍历处理每个输入数据项\nfor (let i = 0; i < inputItems.length; i++) {\n    const currentItem = inputItems[i];\n    const markdownInput = currentItem.json.data;\n    \n    if (!markdownInput) {\n        // 如果没有数据，跳过这个项目\n        continue;\n    }\n    \n    const plainText = markdownToText(markdownInput);\n    const textSegments = splitTextIntoSegments(plainText);\n\n    // 将文本段落转换为规范的block对象格式\n    const blocks = textSegments.map(segment => ({\n        object: 'block',\n        type: 'paragraph',\n        paragraph: {\n            rich_text: [\n                {\n                    type: 'text',\n                    annotations: {\n                        bold: false,\n                        strikethrough: false,\n                        underline: false,\n                        italic: false,\n                        code: false,\n                        color: 'default'\n                    },\n                    text: {\n                        content: segment\n                    }\n                }\n            ]\n        }\n    }));\n\n    // 只返回blocks字段\n    results.push({\n        json: {\n            blocks: blocks\n        }\n    });\n}\n\nreturn results;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1360,
+        -20
+      ],
+      "id": "ba1415fd-a1f2-4427-8009-2d88673e6ae4",
+      "name": "将Markdown文本转换为纯文本"
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "=https://api.notion.com/v1/blocks/{{ $json.id }}/children",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "notionApi",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "children",
+              "value": "={{ $json.blocks }}"
+            }
+          ]
+        },
+        "options": {
+          "batching": {
+            "batch": {
+              "batchSize": 1,
+              "batchInterval": 5000
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1800,
+        155
+      ],
+      "id": "1118d30b-0128-4121-ba03-4e385bf5a52c",
+      "name": "HTTP Request2",
+      "credentials": {
+        "notionApi": {
+          "id": "tHqNwAxXQ88MGWlm",
+          "name": "Notion account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "databaseId": {
+          "__rl": true,
+          "value": "1c0629a6-152d-80f1-bcc6-f290acf42b1f",
+          "mode": "list",
+          "cachedResultName": "AI资讯",
+          "cachedResultUrl": "https://www.notion.so/1c0629a6152d80f1bcc6f290acf42b1f"
+        },
+        "title": "={{ $json.title }}",
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "标题|title",
+              "title": "={{ $json.title }}"
+            },
+            {
+              "key": "url|rich_text",
+              "textContent": "={{ $json.url }}"
+            },
+            {
+              "key": "时间|rich_text",
+              "textContent": "={{ $json.post_time_str }}"
+            },
+            {
+              "key": "来源|rich_text",
+              "textContent": "={{ $('Loop Over Items').item.json.value }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        1300,
+        180
+      ],
+      "id": "1416f3b7-f7b9-4081-ab22-574e8f30620e",
+      "name": "Notion",
+      "credentials": {
+        "notionApi": {
+          "id": "tHqNwAxXQ88MGWlm",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1580,
+        80
+      ],
+      "id": "a5d4440f-003a-4c8c-a3af-6e1508eb6989",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "jsCode": "const array1 = $input.first().json.biz;\nconst array2 = $input.first().json.name;\nconst combined = [];\n\nfor (let i = 0; i < array1.length; i++) {\n  combined.push({\n    key: array1[i],\n    value: array2[i]\n  });\n}\n\nreturn combined.map(item => ({ json: item }));\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -180,
+        155
+      ],
+      "id": "3e1ded6b-3e1e-43a4-b636-71b12866ac3c",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "content": "## 文章同步完成后动作\n- 发送Telegram通知\n- 执行内容加工工作流，如：日报工作流、小红书发布工作流等",
+        "height": 360,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        200,
+        0
+      ],
+      "typeVersion": 1,
+      "id": "18a47190-d333-4801-81ce-7224101b45db",
+      "name": "Sticky Note"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Split Out1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "HTML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTML": {
+      "main": [
+        [
+          {
+            "node": "将Markdown文本转换为纯文本",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Notion",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "将Markdown文本转换为纯文本": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notion": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Limit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request2": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "6a75d555-b3f7-40a9-b731-9caf6fd9485a",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "667f8e49cea6f05a4f2d4764a2ef083b44c681d7bcf3709cc71f85be90eeca2e"
+  },
+  "id": "QXLONxN5sGanFIvH",
+  "tags": []
+}
