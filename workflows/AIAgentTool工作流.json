@@ -1,0 +1,626 @@
+{
+  "name": "AI Agent Tool工作流",
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=素材：{{ $json.cleanText }}\n创作类型：{{ $('On form submission').item.json[\"创作类型\"] }}",
+        "needsFallback": true,
+        "options": {
+          "systemMessage": "你是一位任务调度员（管理员），负责分析用户需求并将任务分配给最合适的AI Agent，不需要自己执行具体工作。你的价值在于能准确判断哪个AI Agent最适合处理特定任务，让整个协作更流畅"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.1,
+      "position": [
+        544,
+        96
+      ],
+      "id": "57063e37-d418-4cef-8feb-997acc8e950b",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatDeepSeek",
+      "typeVersion": 1,
+      "position": [
+        384,
+        320
+      ],
+      "id": "c9c295d8-a687-47ba-bb4c-e4857aba4787",
+      "name": "DeepSeek Chat Model",
+      "credentials": {
+        "deepSeekApi": {
+          "id": "4u9TInsIfdWaWI2C",
+          "name": "DeepSeek account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "numberInputs": 3,
+        "rules": {
+          "rule": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "a0625398-4091-4b26-a97f-0b80ba05b798",
+                    "leftValue": "={{ $('On form submission').item.json[\"创作类型\"] }}",
+                    "rightValue": "Twitter",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "modelIndex": 2,
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "2442909b-a6c1-4779-a162-43bbd41c7772",
+                    "leftValue": "={{ $('On form submission').item.json[\"创作类型\"] }}",
+                    "rightValue": "朋友圈",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "modelIndex": 3,
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "b2710864-2ecb-4471-8c5f-5fdec9f8da1b",
+                    "leftValue": "={{ $('On form submission').item.json[\"创作类型\"] }}",
+                    "rightValue": "小红书",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.modelSelector",
+      "typeVersion": 1,
+      "position": [
+        960,
+        624
+      ],
+      "id": "e2cafba6-1cb7-4172-8073-fa9e996c6e46",
+      "name": "Model Selector"
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-4o",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        912,
+        832
+      ],
+      "id": "10c34af4-8c4e-48be-bd22-c7939aad2a40",
+      "name": "gpt-4o",
+      "credentials": {
+        "openRouterApi": {
+          "id": "NEOGNnmguJrQ5uCV",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "anthropic/claude-sonnet-4",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        1072,
+        832
+      ],
+      "id": "da9b3eb0-6163-46be-87a0-a34ed2f7b8a0",
+      "name": "claude-sonnet-4",
+      "credentials": {
+        "openRouterApi": {
+          "id": "NEOGNnmguJrQ5uCV",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatDeepSeek",
+      "typeVersion": 1,
+      "position": [
+        1200,
+        832
+      ],
+      "id": "2da584aa-11a4-4720-bf8c-e3c5d63c3d02",
+      "name": "DeepSeek Chat Model1",
+      "credentials": {
+        "deepSeekApi": {
+          "id": "4u9TInsIfdWaWI2C",
+          "name": "DeepSeek account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "formTitle": "社交媒体内容创作",
+        "formDescription": "根据用户输入，自动创建不同风格的社交媒体内容",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "内容来源",
+              "fieldType": "textarea",
+              "placeholder": "请输入内容来源，如：文案/url",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "创作类型",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Twitter"
+                  },
+                  {
+                    "option": "小红书"
+                  },
+                  {
+                    "option": "朋友圈"
+                  }
+                ]
+              },
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        -496,
+        96
+      ],
+      "id": "bd687cda-7345-4f23-8a63-9e19b6100d40",
+      "name": "On form submission",
+      "webhookId": "cdac5ca7-54d0-427a-93b7-98c7acc1cecd"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "fbe32261-3848-42c1-919e-e789ead34376",
+              "leftValue": "={{ $('On form submission').item.json['内容来源'] }}",
+              "rightValue": "^(https?:\\/\\/)?([\\w\\-]+\\.)+[\\w\\-]+(\\/[\\w\\-.~:?#\\[\\]@!$&'()*+,;=]*)*$",
+              "operator": {
+                "type": "string",
+                "operation": "regex"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -272,
+        96
+      ],
+      "id": "f505a44b-14ab-4dd9-b612-e2e11b92f62b",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('On form submission').item.json[\"内容来源\"] }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -48,
+        0
+      ],
+      "id": "d6a92c9a-bb6a-41be-b1ad-ff5cc29ecbb7",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "jsCode": "// 获取HTML内容\nlet htmlContent = $input.first().json.data || '';\n\nif (!htmlContent) {\n  return [{\n    json: {\n      cleanText: '',\n      originalLength: 0,\n      cleanLength: 0\n    }\n  }];\n}\n\n// 去除script和style标签及其内容\nhtmlContent = htmlContent.replace(/<script[^>]*>[\\s\\S]*?<\\/script>/gi, '');\nhtmlContent = htmlContent.replace(/<style[^>]*>[\\s\\S]*?<\\/style>/gi, '');\n\n// 为块级元素添加换行标记\nconst blockElements = [\n  'div', 'p', 'br', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',\n  'li', 'ul', 'ol', 'blockquote', 'pre', 'hr', 'table',\n  'tr', 'td', 'th', 'header', 'footer', 'section', 'article',\n  'nav', 'main', 'aside'\n];\n\nblockElements.forEach(tag => {\n  const regex = new RegExp(`<\\\\/?${tag}[^>]*>`, 'gi');\n  htmlContent = htmlContent.replace(regex, '\\n');\n});\n\n// 去除所有剩余的HTML标签\nhtmlContent = htmlContent.replace(/<[^>]*>/g, '');\n\n// 解码常见的HTML实体\nconst htmlEntities = {\n  \"&amp;\": \"&\",\n  \"&lt;\": \"<\",\n  \"&gt;\": \">\",\n  \"&quot;\": \"\\\"\",\n  \"&#39;\": \"'\",\n  \"&apos;\": \"'\",\n  \"&nbsp;\": \" \",\n  \"&copy;\": \"©\",\n  \"&reg;\": \"®\",\n  \"&trade;\": \"™\",\n  \"&hellip;\": \"…\",\n  \"&mdash;\": \"—\",\n  \"&ndash;\": \"–\",\n  \"&lsquo;\": \"'\",\n  \"&rsquo;\": \"'\",\n  \"&ldquo;\": \"\\\"\",\n  \"&rdquo;\": \"\\\"\"\n};\n\nObject.keys(htmlEntities).forEach(entity => {\n  const regex = new RegExp(entity, 'g');\n  htmlContent = htmlContent.replace(regex, htmlEntities[entity]);\n});\n\n// 解码数字HTML实体（如 &#123;）\nhtmlContent = htmlContent.replace(/&#(\\d+);/g, (match, dec) => {\n  return String.fromCharCode(dec);\n});\n\n// 解码十六进制HTML实体（如 &#x7B;）\nhtmlContent = htmlContent.replace(/&#x([0-9A-Fa-f]+);/g, (match, hex) => {\n  return String.fromCharCode(parseInt(hex, 16));\n});\n\n// 清理和格式化文本\nhtmlContent = htmlContent\n  .replace(/\\n\\s*\\n\\s*\\n/g, '\\n\\n')  // 三个或更多连续换行合并为两个\n  .replace(/[ \\t]+/g, ' ')            // 多个连续空格/制表符合并为一个空格\n  .replace(/^\\s+|\\s+$/g, '')          // 去除首尾空白\n  .replace(/\\n /g, '\\n')              // 去除行首空格\n  .replace(/ \\n/g, '\\n')              // 去除行尾空格\n  .replace(/\\n{3,}/g, '\\n\\n');        // 确保最多只有两个连续换行\n\n// 返回处理结果\nreturn [{\n  json: {\n    cleanText: htmlContent,\n    originalLength: ($input.first().json.data || '').length,\n    cleanLength: htmlContent.length,\n    wordCount: htmlContent.trim() ? htmlContent.trim().split(/\\s+/).length : 0\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        176,
+        0
+      ],
+      "id": "0019f340-b83e-4795-b2fd-6ed4c83f97fd",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7f724f2f-0c6c-45ab-9786-7dbeee37081a",
+              "name": "cleanText",
+              "value": "={{ $('On form submission').item.json[\"内容来源\"] }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        176,
+        192
+      ],
+      "id": "8a0734e7-a85e-4783-861f-ca41adc428d7",
+      "name": "Edit Fields3"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "chatgpt-4o-latest",
+          "mode": "list",
+          "cachedResultName": "chatgpt-4o-latest"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        528,
+        336
+      ],
+      "id": "1ba88b31-a6cf-4084-ab88-37d92b8ee736",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "uaAwguwQSTGKdXYU",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## TIPS\n- 名称可使用：英文、数字、下划线_、连字符-\n- 不允许包含空格、特殊字符（如句号、括号、@、# 等）或中文",
+        "height": 288,
+        "width": 480,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1264,
+        192
+      ],
+      "typeVersion": 1,
+      "id": "0a8ed1ae-7f52-4dcf-aa31-d15bc2529f7c",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Create Tweet in X",
+        "text": "={{ $fromAI('Text', `Tweet content`, 'string') }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.twitterTool",
+      "typeVersion": 2,
+      "position": [
+        800,
+        608
+      ],
+      "id": "22119510-7ada-4207-8bbe-0d49ee2fb562",
+      "name": "Create Tweet in X",
+      "credentials": {
+        "twitterOAuth2Api": {
+          "id": "hl5pF5tMUmTOsEbE",
+          "name": "X account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toolDescription": "当需要撰写X/Twitter推文时，请调用此AI Agent",
+        "text": "={{ $fromAI('Prompt__User_Message_', ``, 'string') }}",
+        "options": {
+          "systemMessage": "=你是一位推文创作专家，擅长将用户提供的素材转化为吸引人的推文。请根据用户提供的内容，创作一条结构清晰、内容生动且连贯的推文，要求如下：\n\n## 内容要求\n- 深入理解用户提供内容的核心信息和背景，确保推文内容有清晰的上下文和逻辑。\n- 推文字符控制在200-250字符内，内容简洁。\n- 推文内容应包含必要的背景信息或引导，使读者能够理解推文的主题和意义，避免突兀和断章取义。\n\n## 自动发布\n- 在生成每条推文后，调用工具“Create Tweet in X”自动发布到Twitter平台。\n- 确保发布操作顺利完成，并反馈发布状态。\n\n## 限制\n- 仅讨论推文创作及发布相关内容，拒绝无关话题。\n- 保证每条推文字符限制内信息完整，避免内容冗余。\n\n请直接输出推文串内容及执行自动发布Tools"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agentTool",
+      "typeVersion": 2.2,
+      "position": [
+        656,
+        320
+      ],
+      "id": "84abb8b7-ae66-4a84-8ffb-2680604acdd1",
+      "name": "Twitter Agent"
+    },
+    {
+      "parameters": {
+        "toolDescription": "当需要撰写小红书/rednote帖子，请调用此AI Agent",
+        "text": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Prompt__User_Message_', ``, 'string') }}",
+        "options": {
+          "systemMessage": "=你是一位资深小红书内容创作专家，擅长将文章内容转化为吸引眼球且具有高互动率的小红书风格文案。请根据提供的内容，创作一篇符合以下要求的小红书文案：\n\n## 风格要求：\n1. 开头使用1-2个吸引眼球的emoji和简洁有力的标题，快速抓住读者注意力。\n2. 语言年轻化、亲切自然，符合小红书用户的表达习惯，带有轻松幽默感。\n3. 适当插入emoji表情，增强趣味性和视觉效果，但不过度堆砌。\n4. 分段清晰，每个段落突出重点，便于阅读和理解。\n5. 结尾部分明确引导用户进行点赞、收藏和评论，提升互动率。\n\n## 内容结构：\n1. 【开头】：用1-2个emoji + 吸引人的标题，营造氛围。\n2. 【正文】：包含3-4个要点，每个要点前加emoji符号，条理清晰，信息丰富。\n3. 【总结】：用简洁有力的语言总结核心观点，增强印象。\n4. 【互动】：设计贴合内容的互动引导语，鼓励用户点赞、收藏和评论。\n5. 【标签】：添加3-5个与内容高度相关的话题标签，方便内容传播。\n\n## 长度控制：\n- 总字数控制在200-300字之间，内容精炼且信息完整，避免冗余。\n\n请严格按照上述要求输出内容，确保文案既符合小红书风格，又具备高吸引力和互动性。"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agentTool",
+      "typeVersion": 2.2,
+      "position": [
+        976,
+        320
+      ],
+      "id": "58fa6f75-7184-4e0e-a5a9-9facd459f02e",
+      "name": "Rednote Agent"
+    },
+    {
+      "parameters": {
+        "toolDescription": "当需要撰写微信朋友圈文案时，请调用此AI Agent",
+        "text": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Prompt__User_Message_', ``, 'string') }}",
+        "options": {
+          "systemMessage": "=你是一位专业的朋友圈文案创作专家，擅长结合用户提供的主题，创作具有专业洞察力且真诚温暖的朋友圈文案。请根据以下要求完成文案创作：\n\n## 文案要求\n1. 字数控制在80-100字之间；\n2. 内容体现行业专业洞察，语言温暖、真诚且富有感染力；\n3. 结合主题，适当穿插个人观点或小故事，增强文案的真实感和立体感；\n4. 适当使用行业相关的专业词汇，但表达通俗易懂，口语化，让人读起来像是真人写的；\n5. 结尾附带1-2个相关且合适的话题标签。\n\n请根据用户提供的主题，输出符合以上要求的朋友圈文案。"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agentTool",
+      "typeVersion": 2.2,
+      "position": [
+        1296,
+        320
+      ],
+      "id": "18c32dc4-4075-417c-b568-f81b96ad322d",
+      "name": "Wechat Agent"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "DeepSeek Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Model Selector": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Twitter Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Rednote Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Wechat Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "gpt-4o": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Model Selector",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "claude-sonnet-4": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Model Selector",
+            "type": "ai_languageModel",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "DeepSeek Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Model Selector",
+            "type": "ai_languageModel",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields3": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Create Tweet in X": {
+      "ai_tool": [
+        [
+          {
+            "node": "Twitter Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Twitter Agent": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Rednote Agent": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wechat Agent": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "f1096fe5-a2b8-4529-abb0-ede77aca67e0",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "b98b98135dab39d60742eab16a2a66a05dec7028bfdb9b31aea7dce5ef9e0c67"
+  },
+  "id": "1K0Z1OcmhnZWng75",
+  "tags": []
+}
