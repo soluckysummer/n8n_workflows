@@ -14,12 +14,17 @@
 - [N8N重磅升级：一键解锁2000+AI工作流节点！](./workflows/community_nodes.json)
 - [还在手动整理Excel？试试这个AI工作流，一键完成数据清洗与校验！](./workflows/ExcelAutoCleaning.json)
 - [AI自动化：一键批量生成爆款海报，效率提升100倍](./workflows/n8nposter.json)
+- [n8n速成指南：10个高手常用的工作流搭建技巧 - webhook演示工作流！](./workflows/webhook_demo.json)
 
-## 使用指南
+### 使用指南
 1. 访问[workflows目录](./workflows)
 2. 下载所需JSON配置文件
 3. 在N8N中点击"Import from file"导入
 4. 根据您的需求调整参数
+
+## 其他n8n学习资源
+
+- [n8n工作流快捷键速查表](./resource/shortcut_key.png)
 
 ## 贡献指南
 欢迎提交您的工作流配置！请确保：
