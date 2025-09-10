@@ -1,0 +1,1093 @@
+{
+  "name": "多平台数据监控(雷达)工作流",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -448,
+        336
+      ],
+      "id": "abece51b-40ee-4521-9459-be0cbc77bb34",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "url": "http://host.docker.internal:1200/jike/topic/63579abb6724cc583b9bba9a",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        -16,
+        656
+      ],
+      "id": "05b53911-51b7-447d-894b-3de4b42751c7",
+      "name": "即刻"
+    },
+    {
+      "parameters": {
+        "url": "http://host.docker.internal:1200/douyin/user/MS4wLjABAAAAG0XHGkqcvD8zFt1oMtgG-NTdoU90fvlF7n36pcJ7uS0ZF1GOnn9VIp6OH48Vs5nc",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        -16,
+        464
+      ],
+      "id": "5c849a0e-cbb0-4139-bd55-db5180e21a9e",
+      "name": "抖音/tiktok"
+    },
+    {
+      "parameters": {
+        "url": "http://host.docker.internal:1200/bilibili/user/video/1316597695",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        -16,
+        80
+      ],
+      "id": "254a8732-5387-4b91-bfb9-6f00f29737ef",
+      "name": "B站"
+    },
+    {
+      "parameters": {
+        "url": "http://host.docker.internal:1200/youtube/user/@linbintalk",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        -16,
+        272
+      ],
+      "id": "9c1e6cd7-895d-482a-afff-c1b970756cbe",
+      "name": "YouTube"
+    },
+    {
+      "parameters": {
+        "url": "=http://host.docker.internal:1200/xiaohongshu/user/{{ $json.users }}/notes",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        608,
+        -400
+      ],
+      "id": "59186cea-77cc-436c-aff7-7d55a884bc0a",
+      "name": "小红书",
+      "notesInFlow": false,
+      "retryOnFail": true,
+      "alwaysOutputData": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "url": "https://www.qbitai.com/feed",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        -16,
+        1040
+      ],
+      "id": "b971a0f2-c0a2-46bf-ae54-b9eff0c45e0d",
+      "name": "量子位"
+    },
+    {
+      "parameters": {
+        "url": "http://host.docker.internal:1200/aibase/news",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        -16,
+        848
+      ],
+      "id": "a0996145-4644-43e5-aea9-44752d440edc",
+      "name": "AIbase"
+    },
+    {
+      "parameters": {
+        "maxItems": 3
+      },
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        800,
+        -400
+      ],
+      "id": "a4187481-1013-407c-b374-e37bb6f5e1e1",
+      "name": "Limit",
+      "alwaysOutputData": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "maxItems": 3
+      },
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        208,
+        80
+      ],
+      "id": "b5e1d7a5-ca7d-4311-af52-b0e89b61c402",
+      "name": "Limit2"
+    },
+    {
+      "parameters": {
+        "maxItems": 3
+      },
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        208,
+        272
+      ],
+      "id": "c1a3ca84-eb2e-4bcc-997f-6ce2cf77e321",
+      "name": "Limit3"
+    },
+    {
+      "parameters": {
+        "maxItems": 3
+      },
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        208,
+        464
+      ],
+      "id": "eaaddcc7-c524-4b4e-a484-5de38ab9866d",
+      "name": "Limit4"
+    },
+    {
+      "parameters": {
+        "maxItems": 3
+      },
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        208,
+        656
+      ],
+      "id": "ee850221-bc7d-4762-ade3-598d96708c2d",
+      "name": "Limit5"
+    },
+    {
+      "parameters": {
+        "maxItems": 3
+      },
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        208,
+        848
+      ],
+      "id": "d92297ae-2766-40fd-8234-d1ff9c372cae",
+      "name": "Limit6"
+    },
+    {
+      "parameters": {
+        "maxItems": 3
+      },
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        208,
+        1040
+      ],
+      "id": "1f1426e4-ec10-4e27-be32-6a27f604a355",
+      "name": "Limit7"
+    },
+    {
+      "parameters": {
+        "jsCode": "const inputData = $input.all();\n\nconst result = inputData.map(item => {\n  // 解析GMT时间并转换为UTC+8\n  let utc8Time;\n  try {\n    const gmtDate = new Date(item.json.pubDate);\n    const utc8Date = new Date(gmtDate.getTime() + 8 * 60 * 60 * 1000);\n    \n    // 格式化为YYYY-MM-DD HH:mm:ss格式\n    utc8Time = utc8Date.toISOString()\n      .replace('T', ' ')\n      .replace('.000Z', '');\n  } catch (error) {\n    utc8Time = item.json.pubDate; // 如果转换失败，保留原值\n  }\n  \n  return {\n    json: {\n      creator: item.json.creator || '',\n      title: item.json.title || '',\n      link: item.json.link || '',\n      contentSnippet: item.json.contentSnippet || '',\n      pubDate: utc8Time\n    }\n  };\n});\n\nreturn result;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1072,
+        -480
+      ],
+      "id": "def1bfa2-0dc2-47a9-8983-c5499d7235d2",
+      "name": "Code",
+      "alwaysOutputData": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const inputData = $input.all();\n\nconst result = inputData.map(item => {\n  // 解析GMT时间并转换为UTC+8\n  let utc8Time;\n  try {\n    const gmtDate = new Date(item.json.pubDate);\n    const utc8Date = new Date(gmtDate.getTime() + 8 * 60 * 60 * 1000);\n    \n    // 格式化为YYYY-MM-DD HH:mm:ss格式\n    utc8Time = utc8Date.toISOString()\n      .replace('T', ' ')\n      .replace('.000Z', '');\n  } catch (error) {\n    utc8Time = item.json.pubDate; // 如果转换失败，保留原值\n  }\n  \n  return {\n    json: {\n      creator: item.json.creator || '',\n      title: item.json.title || '',\n      link: item.json.link || '',\n      contentSnippet: item.json.contentSnippet || '',\n      pubDate: utc8Time\n    }\n  };\n});\n\nreturn result;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        432,
+        80
+      ],
+      "id": "12208166-cb64-4c10-ad70-4c409cd4f77a",
+      "name": "Code2"
+    },
+    {
+      "parameters": {
+        "jsCode": "const inputData = $input.all();\n\nconst result = inputData.map(item => {\n  // 解析GMT时间并转换为UTC+8\n  let utc8Time;\n  try {\n    const gmtDate = new Date(item.json.pubDate);\n    const utc8Date = new Date(gmtDate.getTime() + 8 * 60 * 60 * 1000);\n    \n    // 格式化为YYYY-MM-DD HH:mm:ss格式\n    utc8Time = utc8Date.toISOString()\n      .replace('T', ' ')\n      .replace('.000Z', '');\n  } catch (error) {\n    utc8Time = item.json.pubDate; // 如果转换失败，保留原值\n  }\n  \n  return {\n    json: {\n      // creator: item.json.creator || '',\n      title: item.json.title || '',\n      link: item.json.link || '',\n      contentSnippet: item.json.contentSnippet || '',\n      pubDate: utc8Time\n    }\n  };\n});\n\nreturn result;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        432,
+        272
+      ],
+      "id": "97549ad0-4804-4905-81fd-3ce290640693",
+      "name": "Code3"
+    },
+    {
+      "parameters": {
+        "jsCode": "const inputData = $input.all();\n\nconst result = inputData.map(item => {\n  // 解析GMT时间并转换为UTC+8\n  let utc8Time;\n  try {\n    const gmtDate = new Date(item.json.pubDate);\n    const utc8Date = new Date(gmtDate.getTime() + 8 * 60 * 60 * 1000);\n    \n    // 格式化为YYYY-MM-DD HH:mm:ss格式\n    utc8Time = utc8Date.toISOString()\n      .replace('T', ' ')\n      .replace('.000Z', '');\n  } catch (error) {\n    utc8Time = item.json.pubDate; // 如果转换失败，保留原值\n  }\n  \n  return {\n    json: {\n      // creator: item.json.creator || '',\n      title: item.json.title || '',\n      link: item.json.link || '',\n      contentSnippet: item.json.contentSnippet || '',\n      pubDate: utc8Time\n    }\n  };\n});\n\nreturn result;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        432,
+        464
+      ],
+      "id": "7b67f17d-2c6d-4b40-9941-37e478cbec19",
+      "name": "Code4"
+    },
+    {
+      "parameters": {
+        "jsCode": "const inputData = $input.all();\n\nconst result = inputData.map(item => {\n  // 解析GMT时间并转换为UTC+8\n  let utc8Time;\n  try {\n    const gmtDate = new Date(item.json.pubDate);\n    const utc8Date = new Date(gmtDate.getTime() + 8 * 60 * 60 * 1000);\n    \n    // 格式化为YYYY-MM-DD HH:mm:ss格式\n    utc8Time = utc8Date.toISOString()\n      .replace('T', ' ')\n      .replace('.000Z', '');\n  } catch (error) {\n    utc8Time = item.json.pubDate; // 如果转换失败，保留原值\n  }\n  \n  return {\n    json: {\n      // creator: item.json.creator || '',\n      title: item.json.title || '',\n      link: item.json.link || '',\n      contentSnippet: item.json.contentSnippet || '',\n      pubDate: utc8Time\n    }\n  };\n});\n\nreturn result;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        432,
+        656
+      ],
+      "id": "9f8a0a92-5e5d-4a04-b651-66485b9300bd",
+      "name": "Code5"
+    },
+    {
+      "parameters": {
+        "jsCode": "const inputData = $input.all();\n\nconst result = inputData.map(item => {\n  // 解析GMT时间并转换为UTC+8\n  let utc8Time;\n  try {\n    const gmtDate = new Date(item.json.pubDate);\n    const utc8Date = new Date(gmtDate.getTime() + 8 * 60 * 60 * 1000);\n    \n    // 格式化为YYYY-MM-DD HH:mm:ss格式\n    utc8Time = utc8Date.toISOString()\n      .replace('T', ' ')\n      .replace('.000Z', '');\n  } catch (error) {\n    utc8Time = item.json.pubDate; // 如果转换失败，保留原值\n  }\n  \n  return {\n    json: {\n      creator: item.json.creator || '',\n      title: item.json.title || '',\n      link: item.json.link || '',\n      contentSnippet: item.json.contentSnippet || '',\n      pubDate: utc8Time\n    }\n  };\n});\n\nreturn result;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        432,
+        848
+      ],
+      "id": "50810500-b7ec-4dd9-9993-3ba1b8a589f6",
+      "name": "Code6"
+    },
+    {
+      "parameters": {
+        "jsCode": "const inputData = $input.all();\n\nconst result = inputData.map(item => {\n  // 解析GMT时间并转换为UTC+8\n  let utc8Time;\n  try {\n    const gmtDate = new Date(item.json.pubDate);\n    const utc8Date = new Date(gmtDate.getTime() + 8 * 60 * 60 * 1000);\n    \n    // 格式化为YYYY-MM-DD HH:mm:ss格式\n    utc8Time = utc8Date.toISOString()\n      .replace('T', ' ')\n      .replace('.000Z', '');\n  } catch (error) {\n    utc8Time = item.json.pubDate; // 如果转换失败，保留原值\n  }\n  \n  return {\n    json: {\n      creator: item.json.creator || '',\n      title: item.json.title || '',\n      link: item.json.link || '',\n      contentSnippet: item.json.contentSnippet || '',\n      pubDate: utc8Time\n    }\n  };\n});\n\nreturn result;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        432,
+        1040
+      ],
+      "id": "5281106f-532c-4401-bae5-637894137de8",
+      "name": "Code7"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "da1908c2-2e6b-4d35-b9a3-f79495e29330",
+              "name": "users",
+              "value": "[\"6457d2e4000000001f030dbe\",\"6479b699000000002a0372a1\"]",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -16,
+        -400
+      ],
+      "id": "7564b50f-5aa8-46ac-9e56-e754680cdcaf",
+      "name": "小红书多账户"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "users",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        192,
+        -400
+      ],
+      "id": "3b2180f8-aaeb-4f56-b0c3-12ebf70d9830",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        400,
+        -400
+      ],
+      "id": "bf4b0d21-345f-4bf3-9b47-ab11c8c7ae8d",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "databaseId": {
+          "__rl": true,
+          "value": "268629a6-152d-806c-99d1-d8e21221b01d",
+          "mode": "list",
+          "cachedResultName": "n8n多平台数据看板",
+          "cachedResultUrl": "https://www.notion.so/268629a6152d806c99d1d8e21221b01d"
+        },
+        "title": "={{ $json.creator }}",
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "所属平台|select",
+              "selectValue": "小红书"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        1072,
+        -336
+      ],
+      "id": "7b224e49-187b-4898-8364-2c8862ee168f",
+      "name": "Create a database page1",
+      "executeOnce": true,
+      "credentials": {
+        "notionApi": {
+          "id": "tHqNwAxXQ88MGWlm",
+          "name": "Notion account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "mode": "chooseBranch"
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1296,
+        -432
+      ],
+      "id": "642e60fe-26be-4bd8-b6cd-0dc2a7bef3d6",
+      "name": "Merge",
+      "alwaysOutputData": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "resource": "block",
+        "blockId": {
+          "__rl": true,
+          "value": "={{ $('Create a database page1').first().json.id}}",
+          "mode": "id"
+        },
+        "blockUi": {
+          "blockValues": [
+            {
+              "type": "heading_3",
+              "textContent": "={{ $json.title }}"
+            },
+            {
+              "textContent": "={{ $json.contentSnippet }}"
+            },
+            {
+              "richText": true,
+              "text": {
+                "text": [
+                  {
+                    "text": "🔗原文链接",
+                    "isLink": true,
+                    "textLink": "={{ $json.link }}",
+                    "annotationUi": {
+                      "color": "blue"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "textContent": "={{ $json.pubDate && $json.pubDate.trim() ? '发布时间：' + $json.pubDate : '' }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        1504,
+        -432
+      ],
+      "id": "5ed61412-006e-4f9d-b457-23807e842979",
+      "name": "Append a block",
+      "alwaysOutputData": false,
+      "credentials": {
+        "notionApi": {
+          "id": "tHqNwAxXQ88MGWlm",
+          "name": "Notion account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "da1908c2-2e6b-4d35-b9a3-f79495e29330",
+              "name": "users",
+              "value": "[\"Linbintalk\",\"n8n_io\"]",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -16,
+        -160
+      ],
+      "id": "142330b3-2f41-414c-b477-a4762d5bd3a8",
+      "name": "twitter多账户"
+    },
+    {
+      "parameters": {
+        "url": "=http://host.docker.internal:1200/twitter/user/{{ $json.users }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        608,
+        -160
+      ],
+      "id": "1ad347fa-88ef-47eb-9302-d77562154b97",
+      "name": "Twitter/X"
+    },
+    {
+      "parameters": {
+        "maxItems": 3
+      },
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        832,
+        -160
+      ],
+      "id": "b0d68761-bb9e-4a56-ae4b-965007fdb64f",
+      "name": "Limit1"
+    },
+    {
+      "parameters": {
+        "jsCode": "const inputData = $input.all();\n\nconst result = inputData.map(item => {\n  // 解析GMT时间并转换为UTC+8\n  let utc8Time;\n  try {\n    const gmtDate = new Date(item.json.pubDate);\n    const utc8Date = new Date(gmtDate.getTime() + 8 * 60 * 60 * 1000);\n    \n    // 格式化为YYYY-MM-DD HH:mm:ss格式\n    utc8Time = utc8Date.toISOString()\n      .replace('T', ' ')\n      .replace('.000Z', '');\n  } catch (error) {\n    utc8Time = item.json.pubDate; // 如果转换失败，保留原值\n  }\n  \n  return {\n    json: {\n      creator: item.json.creator || '',\n      title: item.json.title || '',\n      link: item.json.link || '',\n      contentSnippet: item.json.contentSnippet || '',\n      pubDate: utc8Time\n    }\n  };\n});\n\nreturn result;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1072,
+        -176
+      ],
+      "id": "27d8d696-e1cf-46a2-8c75-5d5e1678ba9f",
+      "name": "Code1"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "users",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        176,
+        -160
+      ],
+      "id": "2197bf22-33cf-4558-ab62-26a3a5ccad4e",
+      "name": "Split Out1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        384,
+        -160
+      ],
+      "id": "0baf5737-64a3-46c5-b7fc-c9770135cc5c",
+      "name": "Loop Over Items1"
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "databaseId": {
+          "__rl": true,
+          "value": "268629a6-152d-806c-99d1-d8e21221b01d",
+          "mode": "list",
+          "cachedResultName": "n8n多平台数据看板",
+          "cachedResultUrl": "https://www.notion.so/268629a6152d806c99d1d8e21221b01d"
+        },
+        "title": "={{ $json.creator }}",
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "所属平台|select",
+              "selectValue": "Twitter"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        1072,
+        -16
+      ],
+      "id": "d4702afb-604c-424a-9e67-52a703cf8d66",
+      "name": "Create a database page",
+      "executeOnce": true,
+      "credentials": {
+        "notionApi": {
+          "id": "tHqNwAxXQ88MGWlm",
+          "name": "Notion account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "mode": "chooseBranch"
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1296,
+        -144
+      ],
+      "id": "4929e436-95cd-4cf0-a09f-1b0a21605d5b",
+      "name": "Merge1",
+      "alwaysOutputData": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "resource": "block",
+        "blockId": {
+          "__rl": true,
+          "value": "={{ $('Create a database page').first().json.id}}",
+          "mode": "id"
+        },
+        "blockUi": {
+          "blockValues": [
+            {
+              "type": "heading_3",
+              "textContent": "={{ $json.title }}"
+            },
+            {
+              "textContent": "={{ $json.contentSnippet }}"
+            },
+            {
+              "richText": true,
+              "text": {
+                "text": [
+                  {
+                    "text": "🔗原文链接",
+                    "isLink": true,
+                    "textLink": "={{ $json.link }}",
+                    "annotationUi": {
+                      "color": "blue"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "textContent": "={{ $json.pubDate && $json.pubDate.trim() ? '发布时间：' + $json.pubDate : '' }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        1488,
+        -144
+      ],
+      "id": "6b532714-c9a9-464d-9226-94d0fe1dfd69",
+      "name": "Append a block1",
+      "alwaysOutputData": false,
+      "credentials": {
+        "notionApi": {
+          "id": "tHqNwAxXQ88MGWlm",
+          "name": "Notion account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "content": "## 细节及衍生工作流\n* 设置动态时间筛选，如：发布时间超过24小时的就排除在外\n* 设置动态去重机制，可以以天为单位，每个账户主体每天存一份记录，定时轮询，以后的内容不重复添加\n* 设置动态提醒通知 》 结合飞书/telegram等\n* 汇总相应的资讯，AI智能分析内容频率、挖掘热点趋势，帮你发现潜在机会\n* 视频内容自动提取字幕，可智能分析内容概要及二创\n* 基于内容汇总，还可以做每日的资讯总结，类似于：群聊简报这种形式、每天自动生产一份日报，自动发送到邮箱里\n\n\n**一劳永逸地解决信息记录和碎片化的问题**",
+        "height": 224,
+        "width": 848,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        736,
+        176
+      ],
+      "id": "c21ec282-4151-4a4f-be4c-bfe6db2396e1",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## 视频笔记\n* Rsshub工具：https://docs.rsshub.app/zh/ \n* Rss插件地址：https://chromewebstore.google.com/detail/rsshub-radar/kefjpfngnndepjbopdmoebkipbgkggaa\n\n### 下载Rsshub docker-compse文件的指令\n* curl -L https://raw.githubusercontent.com/DIYgod/RSSHub/master/docker-compose.yml -o docker-compose.yml\n* wget https://raw.githubusercontent.com/DIYgod/RSSHub/master/docker-compose.yml\n\n### 部署项目指令：docker compose up -d\n\n### 更多n8n学习资料\n* AI学长频道：https://www.youtube.com/@linbintalk\n* AI自动化大师课：https://ailinplus-s-school.teachable.com/p/ai\n* n8n工作流合集：https://github.com/soluckysummer/n8n_workflows",
+        "height": 384,
+        "width": 848
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        736,
+        448
+      ],
+      "id": "5a4e9cae-b3fe-4534-87d0-5f155c2700cc",
+      "name": "Sticky Note1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "即刻",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "抖音/tiktok",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "YouTube",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "B站",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "AIbase",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "量子位",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "小红书多账户",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "twitter多账户",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "即刻": {
+      "main": [
+        [
+          {
+            "node": "Limit5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "小红书": {
+      "main": [
+        [
+          {
+            "node": "Limit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "B站": {
+      "main": [
+        [
+          {
+            "node": "Limit2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "YouTube": {
+      "main": [
+        [
+          {
+            "node": "Limit3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "抖音/tiktok": {
+      "main": [
+        [
+          {
+            "node": "Limit4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AIbase": {
+      "main": [
+        [
+          {
+            "node": "Limit6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "量子位": {
+      "main": [
+        [
+          {
+            "node": "Limit7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Create a database page1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit2": {
+      "main": [
+        [
+          {
+            "node": "Code2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit3": {
+      "main": [
+        [
+          {
+            "node": "Code3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit4": {
+      "main": [
+        [
+          {
+            "node": "Code4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit5": {
+      "main": [
+        [
+          {
+            "node": "Code5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit6": {
+      "main": [
+        [
+          {
+            "node": "Code6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit7": {
+      "main": [
+        [
+          {
+            "node": "Code7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "小红书多账户": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "小红书",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a database page1": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Append a block",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append a block": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Twitter/X": {
+      "main": [
+        [
+          {
+            "node": "Limit1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit1": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Create a database page",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "twitter多账户": {
+      "main": [
+        [
+          {
+            "node": "Split Out1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items1": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Twitter/X",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge1": {
+      "main": [
+        [
+          {
+            "node": "Append a block1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a database page": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Append a block1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "dab8585a-89af-4cd0-ba75-da72d64f8a6b",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "667f8e49cea6f05a4f2d4764a2ef083b44c681d7bcf3709cc71f85be90eeca2e"
+  },
+  "id": "Y1Cx4qJEz1EqxRdR",
+  "tags": []
+}
