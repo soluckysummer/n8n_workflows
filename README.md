@@ -4,7 +4,7 @@
 
 ### 个人信息
 1. YouTube频道：https://www.youtube.com/@linbintalk
-2. AI学长的博客：https://ai.linbintalk.com/
+2. B站：https://space.bilibili.com/1316597695
 
 ## 工作流列表
 - [n8n工作流外接：零代码封装成应用，突破使用限制，自由分享！](https://ailinplus-s-school.teachable.com/courses/ai/lectures/63730041)
