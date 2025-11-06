@@ -7,6 +7,7 @@
 2. AI学长的博客：https://ai.linbintalk.com/
 
 ## 工作流列表
+- [n8n工作流外接：零代码封装成应用，突破使用限制，自由分享！](https://ailinplus-s-school.teachable.com/courses/ai/lectures/63730041)
 - [n8n重磅更新：自动生成工作流，实测效果惊人，最强AI工作流生成器 | N8N Workflow Builder](./workflows/Web内容摘要与多平台文案.json)
 - [免费n8n工作流：一键监控X、公众号、小红书、抖音、YouTube所有动态，保姆级教程！](./workflows/多平台数据监控(雷达)工作流.json)
 - [【限免】最强AI工作流：短视频创作全流程自动化、一键“筛选+复刻”低粉爆款短视频！](./workflows/一键“复刻”爆款短视频.json)

@@ -1,0 +1,348 @@
+{
+  "name": "MBTI Webhook",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "f2318528-f36e-48a0-9f7c-784ac521c111",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -336,
+        -192
+      ],
+      "id": "dd92818c-97bd-471e-a746-a4bf5cbad567",
+      "name": "Webhook",
+      "webhookId": "f2318528-f36e-48a0-9f7c-784ac521c111"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        112,
+        -192
+      ],
+      "id": "9ca57ef4-581b-4950-992e-4766caa6a7fb",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "bd8bb0b1-1729-41d8-a066-519d4fea4651",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -336,
+        128
+      ],
+      "id": "ce2faa51-093f-4672-8f2c-384de1b67c7b",
+      "name": "Webhook1",
+      "webhookId": "bd8bb0b1-1729-41d8-a066-519d4fea4651"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://apis.juhe.cn/fapig/character_test/questions",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "key",
+              "value": "聚合api key"
+            },
+            {
+              "name": "level",
+              "value": "senior"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/x-www-form-urlencoded"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -112,
+        -192
+      ],
+      "id": "f82ba94c-2cab-49e7-9197-e6049871bb19",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "url": "http://apis.juhe.cn/fapig/character_test/analysis",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "key",
+              "value": "聚合api key"
+            },
+            {
+              "name": "answers",
+              "value": "={{ $json.body.answers }}"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/x-www-form-urlencoded"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -112,
+        128
+      ],
+      "id": "7923c9e2-395b-4ddb-81a3-5511937b1227",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "value": "0uzimSs7KGsiL6VH",
+          "mode": "list",
+          "cachedResultName": "MBTI list",
+          "cachedResultUrl": "/projects/onPDTuNS53OD4oxL/datatables/0uzimSs7KGsiL6VH"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Email": "={{ $('Webhook1').item.json.body.email }}",
+            "MBTI": "={{ $json.result.alphabet }}",
+            "summarize": "={{ $json.result.summarize.join('') }}",
+            "occupation": "={{ $json.result.occupation }}",
+            "characteristic": "={{ $json.result.characteristic[0].desc.join('') }}"
+          },
+          "matchingColumns": [
+            "Email"
+          ],
+          "schema": [
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "MBTI",
+              "displayName": "MBTI",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "summarize",
+              "displayName": "summarize",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "occupation",
+              "displayName": "occupation",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "characteristic",
+              "displayName": "characteristic",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        112,
+        224
+      ],
+      "id": "db29b74a-56ab-4981-b598-22088008ab6b",
+      "name": "Insert row"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        336,
+        32
+      ],
+      "id": "b09bd62d-f31e-4d5b-aa6c-f9f1f5b1e841",
+      "name": "Respond to Webhook1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        560,
+        32
+      ],
+      "id": "dc70a0a2-6913-47c6-9940-908902c2d971",
+      "name": "Send a message",
+      "webhookId": "f00ba6fc-c44a-4539-95e1-0d5c24ffaf5e",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "amount": 3
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        112,
+        32
+      ],
+      "id": "09520ba8-eabc-42b0-af4a-9951b51d15df",
+      "name": "Wait",
+      "webhookId": "ce7cb99a-65c9-43f3-8388-82baab80443f"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "Insert row",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert row": {
+      "main": [
+        []
+      ]
+    },
+    "Respond to Webhook1": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Respond to Webhook": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "31078d83-c0b1-4c1c-b2fc-c75e925edec3",
+  "meta": {
+    "instanceId": "667f8e49cea6f05a4f2d4764a2ef083b44c681d7bcf3709cc71f85be90eeca2e"
+  },
+  "id": "blPH6TPSexOgskf2",
+  "tags": []
+}
