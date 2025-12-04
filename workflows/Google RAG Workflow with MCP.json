@@ -1,0 +1,452 @@
+{
+  "name": "Google RAG Workflow with MCP",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -240,
+        -256
+      ],
+      "id": "c24314a5-1775-4c0e-88eb-924b0b971d9d",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://generativelanguage.googleapis.com/v1beta/fileSearchStores",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpQueryAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "displayName",
+              "value": "空间名称"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        16,
+        -256
+      ],
+      "id": "45b36306-8f89-4693-8eb8-c69f353c8fce",
+      "name": "HTTP Request",
+      "credentials": {
+        "httpQueryAuth": {
+          "id": "t6XdGcDAZ8UGFdYP",
+          "name": "google studio key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "formTitle": "上传文件",
+        "formDescription": "上传文件",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "File",
+              "fieldType": "file",
+              "multipleFiles": false,
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.3,
+      "position": [
+        -256,
+        16
+      ],
+      "id": "69bbee8d-0476-4c5a-adbc-ccd24476ac7f",
+      "name": "On form submission",
+      "webhookId": "27a474a3-92b9-4725-bb7c-1fd5111099cc"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://generativelanguage.googleapis.com/upload/v1beta/{空间名称}:uploadToFileSearchStore",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpQueryAuth",
+        "sendBody": true,
+        "contentType": "binaryData",
+        "inputDataFieldName": "File",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        16,
+        16
+      ],
+      "id": "f0d949dc-fbc6-4468-9d5a-9dc3ff3e2536",
+      "name": "HTTP Request1",
+      "credentials": {
+        "httpQueryAuth": {
+          "id": "t6XdGcDAZ8UGFdYP",
+          "name": "google studio key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -272,
+        272
+      ],
+      "id": "2ab22b48-871f-40ab-91ca-715e67efcf4a",
+      "name": "When chat message received",
+      "webhookId": "49ea7558-301a-4f87-a842-7ba3c9b4003e"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "=你是一个基于知识库(RAG)的智能助手。请严格依据知识库信息回答问题，确保内容真实可靠；回答时需注明信息来源。"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        -64,
+        272
+      ],
+      "id": "711ca8f9-a350-4504-9dff-c153404af9f1",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpQueryAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"contents\": [{\n        \"parts\": [{\n            \"text\": \"{{ $fromAI('query','Questions asked by users') }}\"\n        }]\n    }],\n    \"tools\": [{\n        \"file_search\": {\n            \"file_search_store_names\": [\"空间名称\"]\n        }\n    }]\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.3,
+      "position": [
+        144,
+        496
+      ],
+      "id": "32cd273c-bb50-4179-b541-dc9b958f18dc",
+      "name": "HTTP Request2",
+      "credentials": {
+        "httpQueryAuth": {
+          "id": "t6XdGcDAZ8UGFdYP",
+          "name": "google studio key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -144,
+        496
+      ],
+      "id": "047a9757-651f-4998-b643-6a253276f04e",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "8TUk57xMDCMcQ7oJ",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## 创建知识库搜索空间",
+        "height": 240,
+        "width": 720
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -416,
+        -336
+      ],
+      "typeVersion": 1,
+      "id": "58867218-d610-4c61-a861-4446ba99705c",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## 上传知识库文档",
+        "height": 240,
+        "width": 720,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -416,
+        -48
+      ],
+      "typeVersion": 1,
+      "id": "4cc6c65a-e7fe-4f5d-9c1c-c19ced5a08c7",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## 知识库文档检索及问答",
+        "height": 448,
+        "width": 720,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -416,
+        224
+      ],
+      "typeVersion": 1,
+      "id": "e1db02cc-f2f0-43ec-86e5-00065e27412c",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "## 知识库文档检索及问答\n1. 介绍：https://blog.google/technology/developers/file-search-gemini-api/\n2. 接入文档示例：https://ai.google.dev/gemini-api/docs/file-search?hl=zh-cn#citations\n3. api文档：https://ai.google.dev/api/file-search/file-search-stores?hl=zh-cn#endpoint\n4. 价格及速率限制：https://ai.google.dev/gemini-api/docs/file-search?hl=zh-cn#rate-limits",
+        "height": 592,
+        "width": 736,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -416,
+        704
+      ],
+      "typeVersion": 1,
+      "id": "9d574c9c-55ed-477f-9f1d-871e94597f08",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "url": "https://generativelanguage.googleapis.com/v1beta/{空间名称}/documents",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpQueryAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -256,
+        1104
+      ],
+      "id": "4cce411e-482e-4e92-ae4b-a83b3985b30f",
+      "name": "查看指定空间文档列表",
+      "credentials": {
+        "httpQueryAuth": {
+          "id": "t6XdGcDAZ8UGFdYP",
+          "name": "google studio key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://generativelanguage.googleapis.com/v1beta/fileSearchStores",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpQueryAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -256,
+        896
+      ],
+      "id": "a0112148-dfea-4f7e-9b83-e517e2719d7b",
+      "name": "查看知识库（搜索）空间列表",
+      "credentials": {
+        "httpQueryAuth": {
+          "id": "t6XdGcDAZ8UGFdYP",
+          "name": "google studio key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "DELETE",
+        "url": "https://generativelanguage.googleapis.com/v1beta/{空间名称}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpQueryAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "force",
+              "value": "true"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        48,
+        896
+      ],
+      "id": "37a92c89-c02b-43ee-bdb2-1d9e2b5839eb",
+      "name": "删除知识库（搜索）空间",
+      "credentials": {
+        "httpQueryAuth": {
+          "id": "t6XdGcDAZ8UGFdYP",
+          "name": "google studio key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "DELETE",
+        "url": "https://generativelanguage.googleapis.com/v1beta/{name=fileSearchStores/*/documents/*}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpQueryAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "force",
+              "value": "true"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        48,
+        1104
+      ],
+      "id": "625867dc-1748-4d48-ae6d-1de4089c9d4a",
+      "name": "删除搜索空间文档",
+      "credentials": {
+        "httpQueryAuth": {
+          "id": "t6XdGcDAZ8UGFdYP",
+          "name": "google studio key"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request2": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": true
+  },
+  "versionId": "9856fdb5-6411-45bc-a324-5c161d381f2f",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "667f8e49cea6f05a4f2d4764a2ef083b44c681d7bcf3709cc71f85be90eeca2e"
+  },
+  "id": "zbiU3AnGQ0OFG5Su",
+  "tags": []
+}

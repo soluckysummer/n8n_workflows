@@ -6,6 +6,7 @@
 2. B站：https://space.bilibili.com/1316597695
 
 ## 工作流列表
+- [【保姆级】RAG智能体终极方案：n8n+Google File Search，零门槛搭建高精度RAG工作流！](./workflows/Google%20RAG%20Workflow%20with%20MCP.json)
 - [n8n工作流外接：零代码封装成应用，突破使用限制，自由分享！](https://ailinplus-s-school.teachable.com/courses/ai/lectures/63730041)
 - [n8n重磅更新：自动生成工作流，实测效果惊人，最强AI工作流生成器 | N8N Workflow Builder](./workflows/Web内容摘要与多平台文案.json)
 - [免费n8n工作流：一键监控X、公众号、小红书、抖音、YouTube所有动态，保姆级教程！](./workflows/多平台数据监控(雷达)工作流.json)
