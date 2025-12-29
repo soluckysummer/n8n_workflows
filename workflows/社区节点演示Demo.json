@@ -1,0 +1,395 @@
+{
+  "name": "社区节点演示Demo",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "查询信息",
+        "formDescription": "通过firecrawl Agent搜索，返回结果",
+        "formFields": {
+          "values": [
+            {
+              "fieldName": "Query",
+              "fieldLabel": "搜索信息",
+              "placeholder": "请输入搜索信息",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.4,
+      "position": [
+        -688,
+        -80
+      ],
+      "id": "971d5123-bf08-4e7a-9f94-a09aa8d96fc2",
+      "name": "On form submission",
+      "webhookId": "e2bfc4d1-27e9-4c7e-baf7-8e80a903055a"
+    },
+    {
+      "parameters": {
+        "resource": "Agent",
+        "operation": "agent",
+        "prompt": "={{ $('On form submission').item.json.Query }}",
+        "requestOptions": {}
+      },
+      "type": "@mendable/n8n-nodes-firecrawl.firecrawl",
+      "typeVersion": 1,
+      "position": [
+        0,
+        -80
+      ],
+      "id": "907d9228-172c-47ed-95d3-afba61aabe1b",
+      "name": "Agent - AI-powered web data extraction (waits for completion)",
+      "credentials": {
+        "firecrawlApi": {
+          "id": "cHgiwE9iJXk508nb",
+          "name": "Firecrawl account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// 获取输入数据\nconst websites = $input.first().json.data.benchmark_websites;\n\n// 中文数字映射\nconst rankNames = ['一', '二', '三', '四', '五', '六', '七', '八', '九', '十'];\n\n// 转换数据格式\nconst records = websites.map(website => {\n  // 初始化fields对象，包含基本信息\n  const fields = {\n    \"网站名称\": website.name,\n    \"URL\": {\n      \"link\": website.url,\n      \"text\": website.name  // 显示的文本，可以是网站名称或URL\n    }\n  };\n  \n  // 添加Top 10模型数据\n  website.top_10_models.forEach((model, index) => {\n    const rankLabel = `第${rankNames[index]}名`;\n    fields[rankLabel] = `${model.model_name} (${model.score})`;\n  });\n  \n  return { fields };\n});\n\n// 返回n8n格式的结果，包装在tabledata中\nreturn [{ json: { tabledata: { records } } }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        224,
+        -176
+      ],
+      "id": "8fc6fbb6-3ecd-4742-bcf9-0964fda20dd7",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "data.benchmark_websites",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        224,
+        16
+      ],
+      "id": "c12b0b44-0f43-42e5-a545-eb2f9a4b7da4",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        448,
+        16
+      ],
+      "id": "096d1aa1-73ca-45ac-b9aa-34d0c3779682",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-3-pro-image-preview",
+          "mode": "list",
+          "cachedResultName": "models/gemini-3-pro-image-preview (Nano Banana Pro)"
+        },
+        "prompt": "=这是一组大语言模型基准测试排行榜的 JSON 数据，请根据这些数据生成一张现代风格的图片，尺寸比例为 9:16（竖版），默认用中文显示\n{{ $input.all().toJsonString() }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        672,
+        -64
+      ],
+      "id": "723b0bd1-3150-4703-ab87-24b18c8670e1",
+      "name": "Generate an image",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "8TUk57xMDCMcQ7oJ",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## n8n社区节点相关网址\n- 节点托管：https://www.npmjs.com/\n- 节点排行榜：https://n8engine.com/community-nodes/ecosystem\n- Top100节点：https://github.com/restyler/awesome-n8n?tab=readme-ov-file\n- 手动安装社区节点：https://docs.n8n.io/integrations/community-nodes/installation/manual-install/#uninstall-a-community-node\n- 飞书API列表：https://open.feishu.cn/document/server-docs/api-call-guide/server-api-list",
+        "height": 224,
+        "width": 688
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        208,
+        240
+      ],
+      "typeVersion": 1,
+      "id": "4e287fe4-dbcc-480c-8c00-4fb3830e4ba5",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "resource": "auth",
+        "operation": "auth:getAccessToken"
+      },
+      "type": "n8n-nodes-feishu-lite.feishuNode",
+      "typeVersion": 1,
+      "position": [
+        -240,
+        -80
+      ],
+      "id": "f135102e-84c9-4ce2-8758-22de8233d118",
+      "name": "获取AccessToken ",
+      "credentials": {
+        "feishuCredentialsApi": {
+          "id": "92FDzwzEYnOgLtne",
+          "name": "飞书文档"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "bitable",
+        "operation": "bitable:table:record:batchAdd",
+        "app_toke": "K3q8bhFSba1Z2RsAueYcmySMnRg",
+        "table_id": "tblqgHvFFl5S0jIt",
+        "user_id_type": "user_id",
+        "body": "={{ $json.tabledata.toJsonString() }}"
+      },
+      "type": "n8n-nodes-feishu-lite.feishuNode",
+      "typeVersion": 1,
+      "position": [
+        448,
+        -176
+      ],
+      "id": "21e81735-1c58-416a-9730-c4eaa9d646f9",
+      "name": "批量更新多维表格",
+      "credentials": {
+        "feishuCredentialsApi": {
+          "id": "92FDzwzEYnOgLtne",
+          "name": "飞书文档"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://open.feishu.cn/open-apis/im/v1/images",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('获取AccessToken ').first().json.accessToken }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "image_type",
+              "value": "message"
+            },
+            {
+              "parameterType": "formBinaryData",
+              "name": "image",
+              "inputDataFieldName": "data"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        896,
+        -64
+      ],
+      "id": "f8d700fd-88e1-475e-9e67-81489481281f",
+      "name": "上传图片"
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "operation": "message:send",
+        "receive_id_type": "chat_id",
+        "receive_id": "oc_b14f58f66e6d9fc36219d20fc5e82897",
+        "msg_type": "image",
+        "content": "={\n  \"image_key\": \"{{ $json.data.image_key }}\"\n}"
+      },
+      "type": "n8n-nodes-feishu-lite.feishuNode",
+      "typeVersion": 1,
+      "position": [
+        1120,
+        16
+      ],
+      "id": "347c8590-a1c2-4d4c-a386-1a2cd976a69d",
+      "name": "发送消息",
+      "credentials": {
+        "feishuCredentialsApi": {
+          "id": "oNpZcIeSojLWouqx",
+          "name": "n8n通知机器人"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-globals.globalConstants",
+      "typeVersion": 1,
+      "position": [
+        -464,
+        -80
+      ],
+      "id": "b01ab528-cdcf-47cc-9565-879ac08a5bdd",
+      "name": "设置表格参数",
+      "credentials": {
+        "globalConstantsApi": {
+          "id": "ASzgLVOxuLuzGvcV",
+          "name": "大模型基准测试排行榜多维表格"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "设置表格参数",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Agent - AI-powered web data extraction (waits for completion)": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "批量更新多维表格",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Generate an image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate an image": {
+      "main": [
+        [
+          {
+            "node": "上传图片",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "获取AccessToken ": {
+      "main": [
+        [
+          {
+            "node": "Agent - AI-powered web data extraction (waits for completion)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "批量更新多维表格": {
+      "main": [
+        []
+      ]
+    },
+    "上传图片": {
+      "main": [
+        [
+          {
+            "node": "发送消息",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "发送消息": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "设置表格参数": {
+      "main": [
+        [
+          {
+            "node": "获取AccessToken ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "bbb3859b-401c-4d1f-a3b0-7e6454c0679d",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "667f8e49cea6f05a4f2d4764a2ef083b44c681d7bcf3709cc71f85be90eeca2e"
+  },
+  "id": "W1GLiHMsxGbULxdm",
+  "tags": []
+}
