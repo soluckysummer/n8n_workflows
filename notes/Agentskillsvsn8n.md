@@ -1,6 +1,7 @@
 ## 相关网站：
+
 1. nodejs：https://nodejs.org/en/download/
-2. 智谱API：https://open.bigmodel.cn/
+2. 智谱API：https://www.bigmodel.cn/glm-coding?ic=DH7I1QKI05
 3. API接入Claude code：https://docs.bigmodel.cn/cn/coding-plan/tool/claude
 4. Docker：https://www.docker.com/
 5. Agent Skills介绍：https://code.claude.com/docs/zh-CN/skills
