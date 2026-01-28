@@ -1,0 +1,770 @@
+{
+  "name": "视频剪藏工作流 Demo",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -800,
+        -160
+      ],
+      "id": "01d13c16-a9d1-4124-9ef0-b3e95cdeda99",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "resource": "playlistItem",
+        "operation": "getAll",
+        "playlistId": "PLORDp40s58gMHecjJRjHQ4J3K23iMrGfd",
+        "returnAll": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.youTube",
+      "typeVersion": 1,
+      "position": [
+        -592,
+        -160
+      ],
+      "id": "fab9b67d-707a-44a5-bcd9-d5f3b5325945",
+      "name": "Get many playlist items",
+      "credentials": {
+        "youTubeOAuth2Api": {
+          "id": "MKyqb2MEWF55chHe",
+          "name": "YouTube account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "4c81e286-8f54-4fe3-980d-de801b8d04d0",
+              "name": "videoname",
+              "value": "={{ $json.snippet.title }}",
+              "type": "string"
+            },
+            {
+              "id": "ba8319e3-e4ba-4cbb-a115-5e9f3de5dc8b",
+              "name": "url",
+              "value": "=https://www.youtube.com/watch?v={{ $json.snippet.resourceId.videoId }}",
+              "type": "string"
+            },
+            {
+              "id": "c7f9de6d-63b7-41ef-bd0e-438190921c34",
+              "name": "pubilsh_time",
+              "value": "={{ $json.contentDetails.videoPublishedAt }}",
+              "type": "string"
+            },
+            {
+              "id": "fe8ad35d-35f1-4248-af6e-adb7e28ac419",
+              "name": "videoId",
+              "value": "={{ $json.snippet.resourceId.videoId }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -368,
+        -160
+      ],
+      "id": "db70c9c3-2a5f-4130-bcf2-63b945354aae",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -80,
+        -160
+      ],
+      "id": "26b80b65-59c5-4547-b990-80e469385cad",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:8081/add",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"url\": \"{{ $json.url }}\",\n  \"quality\": \"720p\",\n  \"format\": \"mp4\", \n  \"folder\": \"demo/assets\"\n}  ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        176,
+        -144
+      ],
+      "id": "c67b8af3-0b94-4041-8e6b-78211d19f5d0",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "fileSelector": "=./n8ndata/downloads/demo/assets/{{ $('Loop Over Items').item.json.videoname }}.*.vtt",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        1264,
+        -128
+      ],
+      "id": "b8955f92-7d2e-480f-9013-41fb46dadbd7",
+      "name": "Read/Write Files from Disk"
+    },
+    {
+      "parameters": {
+        "operation": "text",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        1504,
+        -128
+      ],
+      "id": "75e3ed32-8afb-4ef1-b487-387457cbc8b9",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=字幕内容如下：{{ $json.data }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "# Role\n你是一位专业的视频内容分析专家，擅长从冗长的视频字幕中提取核心观点，并将其整理成结构清晰、带标签分类、易于检索的摘要和二级大纲。\n\n# Task\n请阅读提供的视频字幕文件（包含时间戳），并按照以下固定模板生成内容：\n\n1. 内容标签：提取 3-5 个核心关键词作为标签（例如：#AI #n8n #自动化 #教程）。要求涵盖视频涉及的核心工具、技术领域和视频性质。\n2. 视频摘要：用一段话（约 150-200 字）高度概括视频的核心内容、逻辑流程以及最终结论。\n3. 亮点大纲（二级结构）：\n   - 一级标题：标注该章节的起始时间戳及核心主题。\n   - 二级要点：罗列该章节下的具体细节、操作步骤或关键论点，并精确标注对应的出现时间。\n\n# Constraints\n- 总结要求：语气客观专业，能够让用户不看视频也能掌握 80% 的核心信息。\n- 时间戳精度：必须严格基于字幕中提供的时间信息，确保准确性。\n- 标签要求：标签需具有检索价值，优先提取工具名、技术名词或场景分类。\n- 语言：统一使用中文。\n- 简洁性：保持简明扼要，严禁冗长废话。"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        1728,
+        -128
+      ],
+      "id": "5aff7633-6bbb-4935-b406-21fc664da379",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatDeepSeek",
+      "typeVersion": 1,
+      "position": [
+        1696,
+        80
+      ],
+      "id": "afc66731-a9e2-4300-beb2-acf809264831",
+      "name": "DeepSeek Chat Model",
+      "credentials": {
+        "deepSeekApi": {
+          "id": "peOp7pcjSxphhmmF",
+          "name": "DeepSeek account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"tags\":[\"标签\",\"标签\",\"标签\"],\n  \"summary\": \"此处填写生成的视频总结全文，要求逻辑连贯，涵盖视频的起因、经过、结果和博主建议。\",\n  \"highlights\": [\n    {\n      \"timestamp\": \"00:00\",\n      \"title\": \"一级标题名称\",\n      \"sub_points\": [\n        {\n          \"timestamp\": \"00:18\",\n          \"content\": \"二级详细要点 1\"\n        },\n        {\n          \"timestamp\": \"01:54\",\n          \"content\": \"二级详细要点 2\"\n        }\n      ]\n    },\n    {\n      \"timestamp\": \"06:48\",\n      \"title\": \"一级标题名称\",\n      \"sub_points\": [\n        {\n          \"timestamp\": \"07:35\",\n          \"content\": \"二级详细要点 1\"\n        },\n        {\n          \"timestamp\": \"08:42\",\n          \"content\": \"二级详细要点 2\"\n        }\n      ]\n    }\n  ]\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        1904,
+        80
+      ],
+      "id": "2bf84f2a-2d70-481b-805d-dd6fd16e1f64",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "databaseId": {
+          "__rl": true,
+          "value": "2ee629a6-152d-809d-963e-db8a25c99189",
+          "mode": "list",
+          "cachedResultName": "视频收藏",
+          "cachedResultUrl": "https://www.notion.so/2ee629a6152d809d963edb8a25c99189"
+        },
+        "title": "={{ $('Loop Over Items').item.json.videoname }}",
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "标题|title",
+              "title": "={{ $('Loop Over Items').item.json.videoname }}"
+            },
+            {
+              "key": "摘要|rich_text",
+              "textContent": "={{ $json.output.summary }}"
+            },
+            {
+              "key": "来源|select",
+              "selectValue": "YouTube"
+            },
+            {
+              "key": "网址|url",
+              "urlValue": "={{ $('Loop Over Items').item.json.url }}"
+            },
+            {
+              "key": "Tag标签|multi_select",
+              "multiSelectValue": "={{ $json.output.tags }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        2128,
+        -352
+      ],
+      "id": "25713bcb-9d44-4274-87c4-3925291d4dfe",
+      "name": "Create a database page",
+      "credentials": {
+        "notionApi": {
+          "id": "tHqNwAxXQ88MGWlm",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "=https://api.notion.com/v1/blocks/{{ $json.id }}/children",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "notionApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"children\": [\n    {\n      \"object\": \"block\",\n      \"type\": \"video\",\n      \"video\": {\n        \"type\": \"external\",\n        \"external\": {\n          \"url\": \"{{ $('Loop Over Items').item.json.url }}\"\n        }\n      }\n    }\n  ]\n} ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        2352,
+        -352
+      ],
+      "id": "8cb98ecb-3fca-448a-8224-1426bda6a609",
+      "name": "HTTP Request1",
+      "credentials": {
+        "notionApi": {
+          "id": "tHqNwAxXQ88MGWlm",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "357c5018-717c-4518-aac9-bd74d992bdb4",
+              "name": "time_line",
+              "value": "={{ $('AI Agent').item.json.output.highlights }}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2880,
+        -352
+      ],
+      "id": "a41ec582-d312-4123-b2b6-7d07e342df16",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "time_line",
+        "include": "allOtherFields",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        3120,
+        -352
+      ],
+      "id": "98825180-ba72-41ca-a73f-e8aa62e2abe0",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "resource": "block",
+        "blockId": {
+          "__rl": true,
+          "value": "={{ $('Create a database page').item.json.url }}",
+          "mode": "url"
+        },
+        "blockUi": {
+          "blockValues": [
+            {
+              "type": "heading_3",
+              "textContent": "={{ $json.time_line.timestamp }} {{ $json.time_line.title }}"
+            },
+            {
+              "textContent": "={{ $json.time_line.sub_points.map(item => `- ${item.timestamp} ${item.content}`).join('\\n') }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        3376,
+        -352
+      ],
+      "id": "61969a11-2fc2-40e2-853a-81794877127a",
+      "name": "Append a block",
+      "credentials": {
+        "notionApi": {
+          "id": "tHqNwAxXQ88MGWlm",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "block",
+        "blockId": {
+          "__rl": true,
+          "value": "={{ $('Create a database page').item.json.url }}",
+          "mode": "url"
+        },
+        "blockUi": {
+          "blockValues": [
+            {
+              "textContent": "={{ $('AI Agent').item.json.output.summary }}"
+            },
+            {
+              "type": "heading_2",
+              "textContent": "内容时间轴："
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        2608,
+        -352
+      ],
+      "id": "25ec4ed3-9f40-41f4-a291-9182fde7a21a",
+      "name": "Append a block1",
+      "credentials": {
+        "notionApi": {
+          "id": "tHqNwAxXQ88MGWlm",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// 获取输入数据\nconst videoName = $('Loop Over Items').first().json.videoname;\nconst url = $('Loop Over Items').first().json.url;\nconst data = $input.first().json.output;\nconst now = new Date();\n\n// 格式化时间为上海时区 YYYY-MM-DD HH:mm\nconst formatDateTime = (date) => {\n  // 转换为上海时区 (UTC+8)\n  const shanghaiTime = new Date(date.toLocaleString('en-US', { timeZone: 'Asia/Shanghai' }));\n  \n  const year = shanghaiTime.getFullYear();\n  const month = String(shanghaiTime.getMonth() + 1).padStart(2, '0');\n  const day = String(shanghaiTime.getDate()).padStart(2, '0');\n  const hours = String(shanghaiTime.getHours()).padStart(2, '0');\n  const minutes = String(shanghaiTime.getMinutes()).padStart(2, '0');\n  return `${year}-${month}-${day} ${hours}:${minutes}`;\n};\n\n// 提取视频ID（从YouTube URL中）\nconst getVideoId = (url) => {\n  const match = url.match(/(?:v=|\\/)([\\w-]{11})/);\n  return match ? match[1] : '';\n};\n\n// 生成文件名（使用视频标题，处理特殊字符和标签）\nconst generateFileName = (title) => {\n  // 移除 #tag 标签\n  let cleanTitle = title.replace(/#\\S+/g, '').trim();\n  \n  // 移除或替换文件名中不允许的特殊字符\n  const sanitizedTitle = cleanTitle\n    .replace(/[<>:\"/\\\\|?*]/g, '') // 移除Windows不允许的字符\n    .replace(/\\s+/g, '_')          // 空格替换为下划线\n    .substring(0, 100);            // 限制长度避免文件名过长\n  \n  return `${sanitizedTitle}.md`;\n};\n\n// 生成YAML前置数据（包含tags数组）\nconst yamlFrontMatter = `---\nurl: ${url}\ntags: ${data.tags.join(', ')}\n来源: YouTube\n添加时间: ${formatDateTime(now)}\n---`;\n\n// 生成视频嵌入（使用videoName作为标题）\nconst videoEmbed = `![${videoName}](${url})`;\n\n// 直接输出摘要内容，不带\"摘要\"标题\nconst summarySection = `${data.summary}`;\n\n// 生成高亮/要点部分\nlet highlightsSection = '## 要点\\n\\n';\n\ndata.highlights.forEach((highlight) => {\n  // 格式化一级标题的时间戳\n  const titleTimeParts = highlight.timestamp.split(':');\n  const titleHours = parseInt(titleTimeParts[0]);\n  const titleMinutes = parseInt(titleTimeParts[1]);\n  const titleSeconds = parseFloat(titleTimeParts[2]);\n  const titleTotalSeconds = titleHours * 3600 + titleMinutes * 60 + titleSeconds;\n  const titleDisplayMinutes = String(Math.floor(titleTotalSeconds / 60)).padStart(2, '0');\n  const titleDisplaySeconds = String(Math.floor(titleTotalSeconds % 60)).padStart(2, '0');\n  const titleDisplayTime = `${titleDisplayMinutes}:${titleDisplaySeconds}`;\n  \n  // 获取视频ID\n  const videoId = getVideoId(url);\n  \n  // 生成一级标题的时间链接\n  const titleTimeLink = `https://www.youtube.com/watch?v=${videoId}&t=${Math.floor(titleTotalSeconds)}#t=${highlight.timestamp}`;\n  \n  // 一级标题（时间链接在外面，标题加粗）\n  highlightsSection += `[${titleDisplayTime}](${titleTimeLink}) **${highlight.title}**\\n\\n`;\n  \n  // 二级内容（无序列表）\n  if (highlight.sub_points && highlight.sub_points.length > 0) {\n    highlight.sub_points.forEach((point) => {\n      // 将时间戳转换为秒数\n      const timeParts = point.timestamp.split(':');\n      const hours = parseInt(timeParts[0]);\n      const minutes = parseInt(timeParts[1]);\n      const seconds = parseFloat(timeParts[2]);\n      const totalSeconds = hours * 3600 + minutes * 60 + seconds;\n      \n      // 格式化时间为 MM:SS\n      const displayMinutes = String(Math.floor(totalSeconds / 60)).padStart(2, '0');\n      const displaySeconds = String(Math.floor(totalSeconds % 60)).padStart(2, '0');\n      const displayTime = `${displayMinutes}:${displaySeconds}`;\n      \n      // 生成带时间戳链接的列表项\n      const timeLink = `https://www.youtube.com/watch?v=${videoId}&t=${Math.floor(totalSeconds)}#t=${point.timestamp}`;\n      highlightsSection += `- [${displayTime}](${timeLink}) ${point.content}\\n`;\n    });\n    highlightsSection += '\\n';\n  }\n});\n\n// 组合完整的markdown内容\nconst markdownContent = `${yamlFrontMatter}\n\n${videoEmbed}\n\n${summarySection}\n\n${highlightsSection}`;\n\n// 返回符合n8n规范的对象数组，包含文件相关信息\nreturn [\n  {\n    json: {\n      fileContent: markdownContent,\n      fileName: generateFileName(videoName),\n      mimeType: 'text/markdown',\n      title: videoName\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2112,
+        0
+      ],
+      "id": "830dcd8f-f978-4c70-9b1b-fd82aafe6324",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "operation": "toText",
+        "sourceProperty": "fileContent",
+        "options": {
+          "fileName": "={{ $json.fileName }}"
+        }
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        2320,
+        0
+      ],
+      "id": "9f16ec9c-fd12-4727-bbd3-749548d7c120",
+      "name": "Convert to File"
+    },
+    {
+      "parameters": {
+        "operation": "write",
+        "fileName": "=./n8ndata/downloads/demo/{{ $('Code in JavaScript').item.json.fileName }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        2528,
+        0
+      ],
+      "id": "1cf8f67d-1956-491a-9219-61dac493c134",
+      "name": "Read/Write Files from Disk1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "aebcfddb-1fa4-49a0-8855-9f49375ee54a",
+              "leftValue": "={{ $json.hasRunningTasks }}",
+              "rightValue": false,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1024,
+        -128
+      ],
+      "id": "b28a4d34-d09d-4937-84b2-af66b58bddf4",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "url": "http://host.docker.internal:8081/history",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        592,
+        -192
+      ],
+      "id": "f935eed6-0e0d-4536-8bd8-93fbef90e6e5",
+      "name": "HTTP Request4"
+    },
+    {
+      "parameters": {
+        "jsCode": "// 从 HTTP Request 节点获取数据\nconst input = $input.first().json;\n\ntry {\n  // 解析 JSON 字符串\n  const history = JSON.parse(input.data);\n  \n  // ========== 1. 检查任务进度 ==========\n  const queueCount = history.queue?.length || 0;\n  const pendingCount = history.pending?.length || 0;\n  const hasRunningTasks = queueCount > 0 || pendingCount > 0;\n  \n  if (hasRunningTasks) {\n    return [{\n      json: {\n        hasRunningTasks: true,\n        status: '任务还在进行中',\n        queueCount: queueCount,\n        pendingCount: pendingCount,\n        message: `还有 ${queueCount + pendingCount} 个任务未完成（队列中: ${queueCount}, 待处理: ${pendingCount}）`\n      }\n    }];\n  }\n  \n  // ========== 2. 找到最新完成的任务 ==========\n  const doneTasks = history.done || [];\n  \n  if (doneTasks.length === 0) {\n    return [{\n      json: {\n        hasRunningTasks: false,\n        status: '没有已完成的任务',\n        error: true,\n        message: '没有找到任何已完成的任务'\n      }\n    }];\n  }\n  \n  // 按时间戳降序排序，取第一个（最新的）\n  const latestTask = doneTasks.reduce((latest, current) => {\n    return (current.timestamp > latest.timestamp) ? current : latest;\n  }, doneTasks[0]);\n  \n  // ========== 3. 检查字幕文件（严格排除弹幕）==========\n  const requestedSubtitles = latestTask.entry?.requested_subtitles || {};\n  \n  // 获取所有字幕语言，严格排除 danmaku\n  const subtitleLanguages = Object.keys(requestedSubtitles).filter(\n    lang => lang !== 'danmaku'\n  );\n  \n  const hasSubtitles = subtitleLanguages.length > 0;\n  const hasDanmaku = requestedSubtitles.hasOwnProperty('danmaku');\n  \n  // ========== 4. 返回完整结果 ==========\n  return [{\n    json: {\n      // 任务进度\n      hasRunningTasks: false,\n      status: '所有任务已完成',\n      totalCompleted: doneTasks.length,\n      \n      // 最新任务信息\n      latestTask: {\n        id: latestTask.id,\n        title: latestTask.title,\n        url: latestTask.url,\n        timestamp: latestTask.timestamp,\n        timestampReadable: new Date(latestTask.timestamp / 1000000).toLocaleString('zh-CN'),\n        size: latestTask.size,\n        sizeMB: (latestTask.size / (1024 * 1024)).toFixed(2),\n        status: latestTask.status\n      },\n      \n      // 字幕检测结果\n      subtitleCheck: {\n        hasSubtitles: hasSubtitles,\n        hasDanmaku: hasDanmaku,\n        subtitleLanguages: subtitleLanguages,\n        subtitleCount: subtitleLanguages.length,\n        result: hasSubtitles \n          ? `✅ 包含字幕文件：${subtitleLanguages.join(', ')}`\n          : (hasDanmaku ? '❌ 仅有弹幕，无字幕文件' : '❌ 无字幕、无弹幕')\n      },\n      \n      // 详细字幕文件信息\n      subtitleFiles: hasSubtitles ? subtitleLanguages.map(lang => ({\n        language: lang,\n        url: requestedSubtitles[lang].url,\n        extension: requestedSubtitles[lang].ext\n      })) : [],\n      \n      // 弹幕信息（如果有）\n      danmaku: hasDanmaku ? {\n        url: requestedSubtitles.danmaku.url,\n        extension: requestedSubtitles.danmaku.ext\n      } : null,\n      \n      // 总结消息\n      message: hasSubtitles \n        ? `✅ 最新任务已完成，包含 ${subtitleLanguages.length} 个字幕文件`\n        : '⚠️ 最新任务已完成，但未包含字幕文件'\n    }\n  }];\n  \n} catch (error) {\n  return [{\n    json: {\n      error: true,\n      errorMessage: error.message,\n      errorStack: error.stack\n    }\n  }];\n}\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        816,
+        -176
+      ],
+      "id": "0033c96f-984b-4d7e-909f-2f7a91e2717a",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "amount": 1
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        384,
+        -160
+      ],
+      "id": "ecadcfe9-0b97-4b33-ac23-eb0903895d6a",
+      "name": "Wait",
+      "webhookId": "528d3245-a2d6-44cd-97c0-b834cb1ed078"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Get many playlist items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many playlist items": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read/Write Files from Disk": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DeepSeek Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Create a database page",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a database page": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "Append a block1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Append a block",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append a block1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File": {
+      "main": [
+        [
+          {
+            "node": "Read/Write Files from Disk1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Read/Write Files from Disk",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request4": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "08b246e7-a2b1-4d2d-aab3-7c1fc3651438",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "667f8e49cea6f05a4f2d4764a2ef083b44c681d7bcf3709cc71f85be90eeca2e"
+  },
+  "id": "rBgHbHMlrO0J0v9k",
+  "tags": []
+}

@@ -6,6 +6,7 @@
 2. B站：https://space.bilibili.com/1316597695
 
 ## 工作流列表
+- [终于，我用AI治好了"只收藏不学习"的坏毛病（附全自动工作流）](./workflows/video_collection.json)
 - [深扒n8n Top100社区节点：装上这些“外挂”，AI工作流强大10倍！](./workflows/社区节点演示Demo.json)
 - [【保姆级】RAG智能体终极方案：n8n+Google File Search，零门槛搭建高精度RAG工作流！](./workflows/Google%20RAG%20Workflow%20with%20MCP.json)
 - [n8n工作流外接：零代码封装成应用，突破使用限制，自由分享！](https://ailinplus-s-school.teachable.com/courses/ai/lectures/63730041)
